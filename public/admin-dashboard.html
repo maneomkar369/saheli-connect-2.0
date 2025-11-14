@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Saheli Connect</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+            <span>Saheli Connect Admin</span>
+        </div>
+        <div class="nav-right">
+            <span id="adminName" class="user-name">Administrator</span>
+            <button id="logoutBtn" class="btn btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</li>
+                <li data-section="users"><i class="fas fa-users"></i> Users</li>
+                <li data-section="connections"><i class="fas fa-link"></i> Connections</li>
+                <li data-section="jobs"><i class="fas fa-briefcase"></i> Jobs</li>
+                <li data-section="reports"><i class="fas fa-flag"></i> Reports <span id="reportCount" class="badge"></span></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <h1>Admin Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h3 id="totalUsers">0</h3>
+                        <p>Total Users</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-tie"></i>
+                        <h3 id="totalEmployers">0</h3>
+                        <p>Employers</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-friends"></i>
+                        <h3 id="totalHelpers">0</h3>
+                        <p>Job Seekers</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-link"></i>
+                        <h3 id="activeConnections">0</h3>
+                        <p>Active Connections</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-briefcase"></i>
+                        <h3 id="activeJobs">0</h3>
+                        <p>Active Jobs</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-flag"></i>
+                        <h3 id="pendingReports">0</h3>
+                        <p>Pending Reports</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="content-section">
+                <h1>User Management</h1>
+                <div class="filters">
+                    <select id="userTypeFilter">
+                        <option value="">All Users</option>
+                        <option value="employer">Employers</option>
+                        <option value="helper">Job Seekers</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                    <button id="applyFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+                <div id="usersTable"></div>
+            </section>
+
+            <!-- Connections Section -->
+            <section id="connections" class="content-section">
+                <h1>Connections</h1>
+                <div class="filters">
+                    <select id="connectionStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button id="applyConnectionFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+                <div id="connectionsTable"></div>
+            </section>
+
+            <!-- Jobs Section -->
+            <section id="jobs" class="content-section">
+                <h1>Job Postings</h1>
+                <div class="filters">
+                    <select id="jobStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    <button id="applyJobFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+                <div id="jobsTable"></div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <h1>User Reports</h1>
+                <div class="filters">
+                    <select id="reportStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="reviewed">Reviewed</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                    <button id="applyReportFilters" class="btn btn-primary">Apply Filters</button>
+                </div>
+                <div id="reportsTable"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>User Details</h2>
+            <div id="userDetails"></div>
+            <div class="modal-actions">
+                <select id="updateStatus">
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <button id="updateUserStatus" class="btn btn-primary">Update Status</button>
+                <button id="deleteUser" class="btn btn-danger">Delete User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Details Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Report Details</h2>
+            <div id="reportDetails"></div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="reportStatus">
+                    <option value="pending">Pending</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Admin Notes</label>
+                <textarea id="adminNotes" rows="3"></textarea>
+            </div>
+            <button id="updateReport" class="btn btn-primary">Update Report</button>
+        </div>
+    </div>
+
+    <script src="js/api-config.js"></script>
+    <script>
+        // Admin dashboard functionality will be in separate JS file
+        const token = localStorage.getItem('token');
+        const userType = localStorage.getItem('userType');
+
+        if (!token || userType !== 'admin') {
+            window.location.href = '/admin.html';
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.clear();
+            window.location.href = '/admin.html';
+        });
+
+        // Load dashboard stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalUsers').textContent = data.stats.users.total;
+                    document.getElementById('totalEmployers').textContent = data.stats.users.employers;
+                    document.getElementById('totalHelpers').textContent = data.stats.users.helpers;
+                    document.getElementById('activeConnections').textContent = data.stats.connections.active;
+                    document.getElementById('activeJobs').textContent = data.stats.jobs.active;
+                    document.getElementById('pendingReports').textContent = data.stats.reports.pending;
+                    
+                    if (data.stats.reports.pending > 0) {
+                        document.getElementById('reportCount').textContent = data.stats.reports.pending;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            const userType = document.getElementById('userTypeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            try {
+                let url = `${API_BASE_URL}/admin/users?`;
+                if (userType) url += `userType=${userType}&`;
+                if (status) url += `status=${status}&`;
+                
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayUsers(data.users);
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function displayUsers(users) {
+            const table = document.getElementById('usersTable');
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>City</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>${user.full_name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.user_type}</td>
+                                <td>${user.city || '-'}</td>
+                                <td><span class="badge badge-${user.account_status}">${user.account_status}</span></td>
+                                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-sm" onclick="viewUser(${user.id})">View</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load connections
+        async function loadConnections() {
+            const status = document.getElementById('connectionStatusFilter').value;
+            
+            try {
+                let url = `${API_BASE_URL}/admin/connections?`;
+                if (status) url += `status=${status}&`;
+                
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayConnections(data.connections);
+                }
+            } catch (error) {
+                console.error('Error loading connections:', error);
+            }
+        }
+
+        function displayConnections(connections) {
+            const table = document.getElementById('connectionsTable');
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employer</th>
+                            <th>Helper</th>
+                            <th>Status</th>
+                            <th>Started</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${connections.map(conn => `
+                            <tr>
+                                <td>${conn.employer_name}</td>
+                                <td>${conn.helper_name}</td>
+                                <td><span class="badge badge-${conn.status}">${conn.status}</span></td>
+                                <td>${conn.started_at ? new Date(conn.started_at).toLocaleDateString() : '-'}</td>
+                                <td>${new Date(conn.created_at).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load jobs
+        async function loadJobs() {
+            const status = document.getElementById('jobStatusFilter').value;
+            
+            try {
+                let url = `${API_BASE_URL}/admin/jobs?`;
+                if (status) url += `status=${status}&`;
+                
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayJobs(data.jobs);
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+            }
+        }
+
+        function displayJobs(jobs) {
+            const table = document.getElementById('jobsTable');
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Employer</th>
+                            <th>Location</th>
+                            <th>Salary</th>
+                            <th>Applications</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${jobs.map(job => `
+                            <tr>
+                                <td>${job.title}</td>
+                                <td>${job.job_type}</td>
+                                <td>${job.employer_name}</td>
+                                <td>${job.location || '-'}</td>
+                                <td>₹${job.salary || '-'}</td>
+                                <td>${job.application_count}</td>
+                                <td><span class="badge badge-${job.status}">${job.status}</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteJob(${job.id})">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load reports
+        async function loadReports() {
+            const status = document.getElementById('reportStatusFilter').value;
+            
+            try {
+                let url = `${API_BASE_URL}/admin/reports?`;
+                if (status) url += `status=${status}&`;
+                
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayReports(data.reports);
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+
+        function displayReports(reports) {
+            const table = document.getElementById('reportsTable');
+            table.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Reporter</th>
+                            <th>Reported User</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reports.map(report => `
+                            <tr>
+                                <td>${report.reporter_name}</td>
+                                <td>${report.reported_name}</td>
+                                <td>${report.reason}</td>
+                                <td><span class="badge badge-${report.status}">${report.status}</span></td>
+                                <td>${new Date(report.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-sm" onclick="viewReport(${report.id})">View</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Section navigation
+        document.querySelectorAll('.sidebar-menu li').forEach(item => {
+            item.addEventListener('click', function() {
+                const section = this.dataset.section;
+                
+                // Update active menu item
+                document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show section
+                document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+                document.getElementById(section).classList.add('active');
+                
+                // Load section data
+                if (section === 'users') loadUsers();
+                else if (section === 'connections') loadConnections();
+                else if (section === 'jobs') loadJobs();
+                else if (section === 'reports') loadReports();
+            });
+        });
+
+        // Filter buttons
+        document.getElementById('applyFilters').addEventListener('click', loadUsers);
+        document.getElementById('applyConnectionFilters').addEventListener('click', loadConnections);
+        document.getElementById('applyJobFilters').addEventListener('click', loadJobs);
+        document.getElementById('applyReportFilters').addEventListener('click', loadReports);
+
+        // Load initial data
+        loadStats();
+    </script>
+</body>
+</html>

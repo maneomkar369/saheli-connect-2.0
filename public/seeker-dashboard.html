@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Dashboard - Saheli Connect</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-hands-helping"></i>
+            <span>Saheli Connect</span>
+        </div>
+        <div class="nav-right">
+            <span id="userName" class="user-name"></span>
+            <button id="logoutBtn" class="btn btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="active" data-section="overview"><i class="fas fa-chart-line"></i> Overview</li>
+                <li data-section="jobs"><i class="fas fa-briefcase"></i> Browse Jobs</li>
+                <li data-section="applications"><i class="fas fa-file-alt"></i> My Applications</li>
+                <li data-section="connections"><i class="fas fa-link"></i> Connections</li>
+                <li data-section="messages"><i class="fas fa-envelope"></i> Messages <span id="messageCount" class="badge"></span></li>
+                <li data-section="reviews"><i class="fas fa-star"></i> My Reviews</li>
+                <li data-section="profile"><i class="fas fa-user"></i> My Profile</li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <h1>Welcome, <span id="welcomeName"></span>!</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h3 id="applicationsCount">0</h3>
+                        <p>Total Applications</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-link"></i>
+                        <h3 id="connectionsCount">0</h3>
+                        <p>Connections</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-star"></i>
+                        <h3 id="rating">0.0</h3>
+                        <p>Your Rating</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3 id="messagesCount">0</h3>
+                        <p>Unread Messages</p>
+                    </div>
+                </div>
+                <div class="notifications">
+                    <h2>Recent Notifications</h2>
+                    <div id="notificationsList"></div>
+                </div>
+            </section>
+
+            <!-- Jobs Section -->
+            <section id="jobs" class="content-section">
+                <h1>Browse Available Jobs</h1>
+                <div class="search-filters">
+                    <input type="text" id="searchCity" placeholder="City">
+                    <select id="searchJobType">
+                        <option value="">Job Type</option>
+                        <option value="full-time">Full Time</option>
+                        <option value="part-time">Part Time</option>
+                        <option value="live-in">Live-in</option>
+                    </select>
+                    <input type="number" id="searchSalaryMin" placeholder="Min Salary">
+                    <input type="number" id="searchSalaryMax" placeholder="Max Salary">
+                    <button id="searchBtn" class="btn btn-primary">Search</button>
+                </div>
+                <div id="jobsList"></div>
+            </section>
+
+            <!-- Applications Section -->
+            <section id="applications" class="content-section">
+                <h1>My Applications</h1>
+                <div id="applicationsList"></div>
+            </section>
+
+            <!-- Connections Section -->
+            <section id="connections" class="content-section">
+                <h1>My Connections</h1>
+                <div id="connectionsList"></div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="content-section">
+                <h1>Messages</h1>
+                <div class="messages-container">
+                    <div class="conversations-list" id="conversationsList"></div>
+                    <div class="chat-area">
+                        <div id="chatHeader" class="chat-header"></div>
+                        <div id="chatMessages" class="chat-messages"></div>
+                        <div class="chat-input">
+                            <input type="text" id="messageInput" placeholder="Type a message...">
+                            <button id="sendMessageBtn" class="btn btn-primary">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reviews Section -->
+            <section id="reviews" class="content-section">
+                <h1>My Reviews</h1>
+                <div id="reviewsList"></div>
+            </section>
+
+            <!-- Profile Section -->
+            <section id="profile" class="content-section">
+                <h1>My Profile</h1>
+                <form id="profileForm">
+                    <h3>Basic Information</h3>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profileFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profileEmail" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="profilePhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" id="profileCity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="profileAddress"></textarea>
+                    </div>
+
+                    <h3>Professional Details</h3>
+                    <div class="form-group">
+                        <label>Experience (Years)</label>
+                        <input type="number" id="experienceYears" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Skills (comma-separated)</label>
+                        <input type="text" id="skills" placeholder="e.g., Cooking, Cleaning, Child Care" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Languages (comma-separated)</label>
+                        <input type="text" id="languages" placeholder="e.g., English, Hindi, Marathi">
+                    </div>
+                    <div class="form-group">
+                        <label>Availability</label>
+                        <select id="availability" required>
+                            <option value="">Select...</option>
+                            <option value="full-time">Full Time</option>
+                            <option value="part-time">Part Time</option>
+                            <option value="live-in">Live-in</option>
+                            <option value="hourly">Hourly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Preferred Job Type (comma-separated)</label>
+                        <input type="text" id="preferredJobType" placeholder="e.g., Cooking, Cleaning">
+                    </div>
+                    <div class="form-group">
+                        <label>Expected Salary (Monthly)</label>
+                        <input type="number" id="expectedSalary">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="bio" rows="4" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <!-- Job Application Modal -->
+    <div id="applyModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Apply for Job</h2>
+            <div id="jobDetails"></div>
+            <form id="applyForm">
+                <div class="form-group">
+                    <label>Cover Letter</label>
+                    <textarea id="coverLetter" rows="5" placeholder="Tell the employer why you're a good fit..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api-config.js"></script>
+    <script src="js/seeker-dashboard.js"></script>
+</body>
+</html>
