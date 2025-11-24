@@ -211,14 +211,18 @@ router.post('/:id/apply', authenticateToken, (req, res) => {
 
     const { coverLetter } = req.body;
 
-    // Check if already applied
-    db.get('SELECT id FROM job_applications WHERE job_id = ? AND applicant_id = ?',
+    // Check if already applied (job_applications uses helper_id)
+    db.get('SELECT id FROM job_applications WHERE job_id = ? AND helper_id = ?',
         [req.params.id, req.user.id], (err, existing) => {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Database error', error: err.message });
+            }
+
             if (existing) {
                 return res.status(400).json({ success: false, message: 'You have already applied for this job' });
             }
 
-            db.run('INSERT INTO job_applications (job_id, applicant_id, cover_letter) VALUES (?, ?, ?)',
+            db.run('INSERT INTO job_applications (job_id, helper_id, cover_letter) VALUES (?, ?, ?)',
                 [req.params.id, req.user.id, coverLetter], function(err) {
                     if (err) {
                         return res.status(500).json({ success: false, message: 'Error applying for job', error: err.message });
@@ -254,15 +258,15 @@ router.get('/:id/applications', authenticateToken, (req, res) => {
             return res.status(404).json({ success: false, message: 'Job not found' });
         }
 
-        if (job.employer_id !== req.user.id && req.user.user_type !== 'admin') {
+        if (job.employer_id !== req.user.id && req.user.userType !== 'admin') {
             return res.status(403).json({ success: false, message: 'You can only view applications for your own jobs' });
         }
 
         const sql = `
             SELECT ja.*, u.full_name, u.email, u.phone, u.profile_image, u.city,
-                   hp.experience_years, hp.skills, hp.languages, hp.bio, hp.rating
+                   hp.experience AS experience, hp.skills, hp.languages, hp.certifications, hp.hourly_rate
             FROM job_applications ja
-            JOIN users u ON ja.applicant_id = u.id
+            JOIN users u ON ja.helper_id = u.id
             LEFT JOIN helper_profiles hp ON u.id = hp.user_id
             WHERE ja.job_id = ?
             ORDER BY ja.created_at DESC
@@ -291,7 +295,7 @@ router.put('/applications/:applicationId', authenticateToken, (req, res) => {
     }
 
     // Verify ownership
-    db.get(`SELECT ja.id, j.employer_id, ja.applicant_id 
+        db.get(`SELECT ja.id, j.employer_id, ja.helper_id 
             FROM job_applications ja 
             JOIN jobs j ON ja.job_id = j.id 
             WHERE ja.id = ?`, [req.params.applicationId], (err, application) => {
@@ -313,10 +317,10 @@ router.put('/applications/:applicationId', authenticateToken, (req, res) => {
                     return res.status(500).json({ success: false, message: 'Error updating application status' });
                 }
 
-                // Notify applicant
+                // Notify applicant (helper)
                 db.run(`INSERT INTO notifications (user_id, title, message, type) 
                         VALUES (?, ?, ?, ?)`,
-                    [application.applicant_id, 'Application Update', `Your job application status has been updated to: ${status}`, 'info']);
+                    [application.helper_id, 'Application Update', `Your job application status has been updated to: ${status}`, 'info']);
 
                 res.json({
                     success: true,
@@ -338,7 +342,7 @@ router.get('/my/applications', authenticateToken, (req, res) => {
         FROM job_applications ja
         JOIN jobs j ON ja.job_id = j.id
         JOIN users u ON j.employer_id = u.id
-        WHERE ja.applicant_id = ?
+        WHERE ja.helper_id = ?
         ORDER BY ja.created_at DESC
     `;
 
